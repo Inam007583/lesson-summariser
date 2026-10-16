@@ -35,7 +35,7 @@ The shape is enforced by OpenAI Structured Outputs (`src/schema.ts`).
 | Env var          | Default  |                                      |
 | ---------------- | -------- | ------------------------------------ |
 | `OPENAI_API_KEY` | required | or pass `apiKey` / `client` in options |
-| `OPENAI_MODEL`   | `gpt-4o` | `gpt-4o-mini` is cheaper but reads small diagram text less well |
+| `OPENAI_MODEL`   | `gpt-4o` | any vision-capable model the key's project allows (e.g. `gpt-4o-mini`, `gpt-5.4-mini`) |
 
 Options (second argument): `apiKey`, `client` (an existing `OpenAI` instance), `model`, `maxPages` (10), `scale` (2), `detail` (`"high"`).
 
