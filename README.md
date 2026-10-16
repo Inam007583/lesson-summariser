@@ -59,3 +59,12 @@ npm run try -- path/to/lesson.pdf
 ```
 
 The prompt lives in `src/prompt.ts`. Edit it to tune summary quality.
+
+### Test page
+
+```sh
+npm run demo   # → http://localhost:3100
+```
+
+This opens a drag-and-drop page that shows the parent and instructor summaries side by side, with the raw JSON underneath.
+It's only for local testing and isn't part of the component (`demo/` doesn't need to be copied into the host app).

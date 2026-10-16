@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson Summariser</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --surface: #fff; --text: #16181d; --muted: #5d6470; --border: #e2e5ea;
+    --accent: #2f6fed; --accent-soft: #e8efff; --warm: #c2620f; --warm-soft: #fff1e4;
+    --danger: #c3362b; --danger-soft: #fdecea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111317; --surface: #1a1d23; --text: #e9ebef; --muted: #9aa1ad; --border: #2c3039;
+      --accent: #7aa2ff; --accent-soft: #1f2a44; --warm: #f2a35e; --warm-soft: #3a2a1b;
+      --danger: #ff8a80; --danger-soft: #3b1f1d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+
+  #drop { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 36px 16px;
+    border: 2px dashed var(--border); border-radius: 12px; background: var(--surface);
+    text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+  #drop:hover, #drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  #drop strong { font-size: 16px; }
+  #drop span { color: var(--muted); font-size: 13px; }
+  #drop.busy { pointer-events: none; opacity: .7; }
+
+  .status { margin: 16px 0 0; padding: 12px 14px; border-radius: 8px; display: none; }
+  .status.loading { display: flex; gap: 10px; align-items: center; background: var(--accent-soft); }
+  .status.error { display: block; background: var(--danger-soft); color: var(--danger); }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--accent); border-right-color: transparent;
+    border-radius: 50%; animation: spin .8s linear infinite; flex: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #result { display: none; margin-top: 28px; }
+  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 4px; }
+  .head h2 { font-size: 20px; margin: 0; }
+  .pill { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px;
+    background: var(--accent-soft); color: var(--accent); }
+  .built { color: var(--muted); margin: 0 0 20px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .card h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .card p { margin: 0; }
+  .card.parent { border-top: 3px solid var(--warm); }
+  .card.instructor { border-top: 3px solid var(--accent); }
+  .card ul { margin: 0; padding-left: 18px; }
+  .card li + li { margin-top: 4px; }
+  .fun { background: var(--warm-soft); border-color: transparent; }
+
+  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; align-items: center; }
+  button { font: inherit; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  .meta { color: var(--muted); font-size: 13px; margin-left: auto; }
+  pre { display: none; margin: 12px 0 0; padding: 14px; overflow-x: auto; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border); font-size: 13px; }
+  pre.show { display: block; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Lesson Summariser</h1>
+  <p class="sub">Drop in a RoboThink lesson PDF to see the summary the host app will receive.</p>
+
+  <label id="drop">
+    <strong>Drop a lesson PDF here</strong>
+    <span>or click to choose a file</span>
+    <input id="file" type="file" accept="application/pdf" hidden>
+  </label>
+  <div id="status" class="status"></div>
+
+  <section id="result">
+    <div class="head"><h2 id="title"></h2><span id="number" class="pill"></span></div>
+    <p id="built" class="built"></p>
+
+    <div class="grid">
+      <div class="card parent"><h3>For parents</h3><p id="parent"></p></div>
+      <div class="card instructor"><h3>For instructors</h3><p id="instructor"></p></div>
+      <div class="card"><h3>Learning aims</h3><ul id="aims"></ul></div>
+      <div class="card"><h3>Skills practised</h3><ul id="skills"></ul></div>
+    </div>
+    <div class="card fun" style="margin-top:16px"><h3>Fun fact</h3><p id="fun"></p></div>
+
+    <div class="tools">
+      <button id="toggle">Show JSON</button>
+      <button id="copy">Copy JSON</button>
+      <span id="meta" class="meta"></span>
+    </div>
+    <pre id="json"></pre>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const drop = $("drop"), status = $("status");
+  let lastJson = "";
+
+  function setStatus(kind, html) {
+    status.className = "status " + kind;
+    status.innerHTML = html;
+  }
+
+  function fillList(el, items) {
+    el.replaceChildren(...items.map((t) => Object.assign(document.createElement("li"), { textContent: t })));
+  }
+
+  async function handle(file) {
+    if (!file) return;
+    if (file.type !== "application/pdf") return setStatus("error", "Please choose a PDF file.");
+
+    drop.classList.add("busy");
+    $("result").style.display = "none";
+    setStatus("loading", `<div class="spinner"></div><div>Reading <b></b>… this usually takes 10–30 seconds.</div>`);
+    status.querySelector("b").textContent = file.name;
+
+    try {
+      const res = await fetch("/api/summarise", {
+        method: "POST", headers: { "Content-Type": "application/pdf" }, body: file,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.statusText);
+      render(data.summary, file.name, data.seconds);
+      status.className = "status";
+    } catch (err) {
+      setStatus("error", "");
+      status.textContent = "Something went wrong: " + err.message;
+    } finally {
+      drop.classList.remove("busy");
+      $("file").value = "";
+    }
+  }
+
+  function render(s, name, seconds) {
+    $("title").textContent = s.lesson_title || "Untitled lesson";
+    $("number").textContent = s.lesson_number ? "Lesson " + s.lesson_number : "";
+    $("number").style.display = s.lesson_number ? "" : "none";
+    $("built").textContent = s.what_was_built;
+    $("parent").textContent = s.parent_summary;
+    $("instructor").textContent = s.instructor_summary;
+    fillList($("aims"), s.learning_aims);
+    fillList($("skills"), s.skills_practised);
+    $("fun").textContent = s.fun_fact;
+    lastJson = JSON.stringify(s, null, 2);
+    $("json").textContent = lastJson;
+    $("meta").textContent = `${name} · ${seconds.toFixed(1)}s`;
+    $("result").style.display = "block";
+  }
+
+  $("file").addEventListener("change", (e) => handle(e.target.files[0]));
+  ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, () => drop.classList.remove("over")));
+  drop.addEventListener("drop", (e) => { e.preventDefault(); handle(e.dataTransfer.files[0]); });
+
+  $("toggle").addEventListener("click", () => {
+    const shown = $("json").classList.toggle("show");
+    $("toggle").textContent = shown ? "Hide JSON" : "Show JSON";
+  });
+  $("copy").addEventListener("click", async () => {
+    await navigator.clipboard.writeText(lastJson);
+    $("copy").textContent = "Copied";
+    setTimeout(() => ($("copy").textContent = "Copy JSON"), 1500);
+  });
+</script>
+</body>
+</html>

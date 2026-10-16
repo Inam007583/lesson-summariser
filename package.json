@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "try": "tsx --env-file-if-exists=.env scripts/try.ts"
+    "try": "tsx --env-file-if-exists=.env scripts/try.ts",
+    "demo": "tsx --env-file-if-exists=.env demo/server.ts"
   },
   "author": "",
   "license": "ISC",
