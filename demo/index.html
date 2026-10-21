@@ -6,170 +6,271 @@
 <title>Lesson Summariser</title>
 <style>
   :root {
-    --bg: #f6f7f9; --surface: #fff; --text: #16181d; --muted: #5d6470; --border: #e2e5ea;
+    --bg: #f6f7f9; --surface: #fff; --surface-2: #f1f3f6; --text: #16181d; --muted: #5d6470; --border: #e2e5ea;
     --accent: #2f6fed; --accent-soft: #e8efff; --warm: #c2620f; --warm-soft: #fff1e4;
-    --danger: #c3362b; --danger-soft: #fdecea;
+    --ok: #1d7f4e; --ok-soft: #e4f5ec; --danger: #c3362b; --danger-soft: #fdecea;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #111317; --surface: #1a1d23; --text: #e9ebef; --muted: #9aa1ad; --border: #2c3039;
+      --bg: #111317; --surface: #1a1d23; --surface-2: #22262d; --text: #e9ebef; --muted: #9aa1ad; --border: #2c3039;
       --accent: #7aa2ff; --accent-soft: #1f2a44; --warm: #f2a35e; --warm-soft: #3a2a1b;
-      --danger: #ff8a80; --danger-soft: #3b1f1d;
+      --ok: #6fd3a0; --ok-soft: #173326; --danger: #ff8a80; --danger-soft: #3b1f1d;
     }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text);
     font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+  main { max-width: 1000px; margin: 0 auto; padding: 32px 16px 64px; }
   h1 { font-size: 22px; margin: 0 0 4px; }
   .sub { color: var(--muted); margin: 0 0 24px; }
 
-  #drop { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 36px 16px;
+  #drop { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 32px 16px;
     border: 2px dashed var(--border); border-radius: 12px; background: var(--surface);
     text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
   #drop:hover, #drop.over { border-color: var(--accent); background: var(--accent-soft); }
   #drop strong { font-size: 16px; }
   #drop span { color: var(--muted); font-size: 13px; }
-  #drop.busy { pointer-events: none; opacity: .7; }
 
-  .status { margin: 16px 0 0; padding: 12px 14px; border-radius: 8px; display: none; }
-  .status.loading { display: flex; gap: 10px; align-items: center; background: var(--accent-soft); }
-  .status.error { display: block; background: var(--danger-soft); color: var(--danger); }
-  .spinner { width: 16px; height: 16px; border: 2px solid var(--accent); border-right-color: transparent;
-    border-radius: 50%; animation: spin .8s linear infinite; flex: none; }
+  .bar { display: none; flex-wrap: wrap; gap: 8px; align-items: center; margin: 20px 0 12px; }
+  .bar.show { display: flex; }
+  .bar .count { color: var(--muted); font-size: 14px; margin-right: auto; }
+  button { font: inherit; font-size: 14px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+
+  .lesson { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; overflow: hidden; }
+  .lesson > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .lesson > summary::-webkit-details-marker { display: none; }
+  .lesson > summary .name { font-weight: 600; }
+  .lesson > summary .file { color: var(--muted); font-size: 13px; }
+  .lesson > summary .right { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .pill { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+  .pill.warm { background: var(--warm-soft); color: var(--warm); }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); }
+  .pill.err { background: var(--danger-soft); color: var(--danger); }
+  .pill.muted { background: var(--surface-2); color: var(--muted); }
+  .spinner { width: 14px; height: 14px; border: 2px solid var(--accent); border-right-color: transparent;
+    border-radius: 50%; animation: spin .8s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  #result { display: none; margin-top: 28px; }
-  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 4px; }
-  .head h2 { font-size: 20px; margin: 0; }
-  .pill { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px;
-    background: var(--accent-soft); color: var(--accent); }
-  .built { color: var(--muted); margin: 0 0 20px; }
+  .body { border-top: 1px solid var(--border); padding: 16px; }
+  .built { color: var(--muted); margin: 0 0 14px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .tabs button { border: none; border-bottom: 2px solid transparent; border-radius: 0; background: none; padding: 8px 12px; color: var(--muted); }
+  .tabs button.on { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+  .pane { display: none; } .pane.on { display: block; }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
-  .card h3 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-  .card p { margin: 0; }
-  .card.parent { border-top: 3px solid var(--warm); }
-  .card.instructor { border-top: 3px solid var(--accent); }
-  .card ul { margin: 0; padding-left: 18px; }
-  .card li + li { margin-top: 4px; }
-  .fun { background: var(--warm-soft); border-color: transparent; }
+  h3 { margin: 18px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  h3:first-child { margin-top: 0; }
+  p { margin: 0; }
+  ul { margin: 0; padding-left: 18px; } li + li { margin-top: 4px; }
+  .lead { font-size: 16px; padding: 14px 16px; background: var(--warm-soft); border-radius: 10px; }
+  .skill { display: grid; grid-template-columns: minmax(140px, auto) 1fr; gap: 4px 12px; align-items: baseline; }
+  .skill + .skill { margin-top: 8px; }
+  @media (max-width: 560px) { .skill { grid-template-columns: 1fr; } }
+  .note { color: var(--muted); font-size: 13px; font-style: italic; }
 
-  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; align-items: center; }
-  button { font: inherit; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--text); cursor: pointer; }
-  button:hover { border-color: var(--accent); }
-  .meta { color: var(--muted); font-size: 13px; margin-left: auto; }
-  pre { display: none; margin: 12px 0 0; padding: 14px; overflow-x: auto; border-radius: 8px;
-    background: var(--surface); border: 1px solid var(--border); font-size: 13px; }
-  pre.show { display: block; }
+  .flow { display: grid; gap: 8px; }
+  .stage { padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 8px 8px 0; }
+  .stage b { display: block; font-size: 13px; margin-bottom: 2px; }
+  .obs { padding: 12px; border: 1px solid var(--border); border-radius: 10px; }
+  .obs + .obs { margin-top: 8px; }
+  .obs .how { color: var(--muted); font-size: 14px; margin: 4px 0 8px; }
+  .obs select { font: inherit; font-size: 14px; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); max-width: 100%; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .ch + .ch { margin-top: 10px; }
+  .ch b { margin-right: 6px; }
+  pre { margin: 0; padding: 14px; overflow-x: auto; border-radius: 8px; background: var(--surface-2); font-size: 13px; }
+  .error { color: var(--danger); }
 </style>
 </head>
 <body>
 <main>
   <h1>Lesson Summariser</h1>
-  <p class="sub">Drop in a RoboThink lesson PDF to see the summary the host app will receive.</p>
+  <p class="sub">Drop in up to 10 RoboThink lesson PDFs to see the parent and instructor outputs the host app will receive.</p>
 
   <label id="drop">
-    <strong>Drop a lesson PDF here</strong>
-    <span>or click to choose a file</span>
-    <input id="file" type="file" accept="application/pdf" hidden>
+    <strong>Drop lesson PDFs here</strong>
+    <span>or click to choose · up to 10 at a time</span>
+    <input id="file" type="file" accept="application/pdf" multiple hidden>
   </label>
-  <div id="status" class="status"></div>
 
-  <section id="result">
-    <div class="head"><h2 id="title"></h2><span id="number" class="pill"></span></div>
-    <p id="built" class="built"></p>
-
-    <div class="grid">
-      <div class="card parent"><h3>For parents</h3><p id="parent"></p></div>
-      <div class="card instructor"><h3>For instructors</h3><p id="instructor"></p></div>
-      <div class="card"><h3>Learning aims</h3><ul id="aims"></ul></div>
-      <div class="card"><h3>Skills practised</h3><ul id="skills"></ul></div>
-    </div>
-    <div class="card fun" style="margin-top:16px"><h3>Fun fact</h3><p id="fun"></p></div>
-
-    <div class="tools">
-      <button id="toggle">Show JSON</button>
-      <button id="copy">Copy JSON</button>
-      <span id="meta" class="meta"></span>
-    </div>
-    <pre id="json"></pre>
-  </section>
+  <div id="bar" class="bar">
+    <span id="count" class="count"></span>
+    <button id="dlJson" disabled>Download JSON</button>
+    <button id="dlCsv" disabled>Download CSV</button>
+    <button id="clear">Clear</button>
+  </div>
+  <div id="list"></div>
 </main>
 
 <script>
+  const MAX_FILES = 10, CONCURRENCY = 3;
   const $ = (id) => document.getElementById(id);
-  const drop = $("drop"), status = $("status");
-  let lastJson = "";
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const list = (items) => items?.length ? `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>` : `<p class="note">None</p>`;
+  const jobs = [];
 
-  function setStatus(kind, html) {
-    status.className = "status " + kind;
-    status.innerHTML = html;
+  function addFiles(files) {
+    const pdfs = [...files].filter((f) => f.type === "application/pdf");
+    if (!pdfs.length) return alert("Please choose PDF files.");
+    const room = MAX_FILES - jobs.filter((j) => j.status !== "done" && j.status !== "error").length;
+    if (pdfs.length > room) alert(`Only ${MAX_FILES} lessons can run at once — taking the first ${Math.max(room, 0)}.`);
+    for (const file of pdfs.slice(0, Math.max(room, 0))) {
+      const job = { id: crypto.randomUUID(), file, status: "queued" };
+      jobs.push(job);
+      $("list").append(renderShell(job));
+    }
+    updateBar();
+    pump();
   }
 
-  function fillList(el, items) {
-    el.replaceChildren(...items.map((t) => Object.assign(document.createElement("li"), { textContent: t })));
+  function pump() {
+    const running = jobs.filter((j) => j.status === "running").length;
+    jobs.filter((j) => j.status === "queued").slice(0, CONCURRENCY - running).forEach(run);
   }
 
-  async function handle(file) {
-    if (!file) return;
-    if (file.type !== "application/pdf") return setStatus("error", "Please choose a PDF file.");
-
-    drop.classList.add("busy");
-    $("result").style.display = "none";
-    setStatus("loading", `<div class="spinner"></div><div>Reading <b></b>… this usually takes 10–30 seconds.</div>`);
-    status.querySelector("b").textContent = file.name;
-
+  async function run(job) {
+    job.status = "running"; job.started = Date.now(); paint(job);
     try {
-      const res = await fetch("/api/summarise", {
-        method: "POST", headers: { "Content-Type": "application/pdf" }, body: file,
-      });
+      const res = await fetch("/api/summarise", { method: "POST", headers: { "Content-Type": "application/pdf" }, body: job.file });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || res.statusText);
-      render(data.summary, file.name, data.seconds);
-      status.className = "status";
+      Object.assign(job, { status: "done", summary: data.summary, seconds: data.seconds });
     } catch (err) {
-      setStatus("error", "");
-      status.textContent = "Something went wrong: " + err.message;
-    } finally {
-      drop.classList.remove("busy");
-      $("file").value = "";
+      Object.assign(job, { status: "error", error: err.message });
     }
+    paint(job); updateBar(); pump();
   }
 
-  function render(s, name, seconds) {
-    $("title").textContent = s.lesson_title || "Untitled lesson";
-    $("number").textContent = s.lesson_number ? "Lesson " + s.lesson_number : "";
-    $("number").style.display = s.lesson_number ? "" : "none";
-    $("built").textContent = s.what_was_built;
-    $("parent").textContent = s.parent_summary;
-    $("instructor").textContent = s.instructor_summary;
-    fillList($("aims"), s.learning_aims);
-    fillList($("skills"), s.skills_practised);
-    $("fun").textContent = s.fun_fact;
-    lastJson = JSON.stringify(s, null, 2);
-    $("json").textContent = lastJson;
-    $("meta").textContent = `${name} · ${seconds.toFixed(1)}s`;
-    $("result").style.display = "block";
+  function renderShell(job) {
+    const el = document.createElement("details");
+    el.className = "lesson"; el.id = job.id;
+    paint(job, el);
+    return el;
   }
 
-  $("file").addEventListener("change", (e) => handle(e.target.files[0]));
+  function paint(job, el = $(job.id)) {
+    const s = job.summary;
+    const status = {
+      queued: `<span class="pill muted">Queued</span>`,
+      running: `<span class="spinner"></span><span class="pill">Reading…</span>`,
+      done: `<span class="pill ok">Done · ${job.seconds?.toFixed(1)}s</span>`,
+      error: `<span class="pill err">Failed</span>`,
+    }[job.status];
+
+    const meta = s ? [
+      s.lesson_number && `<span class="pill">Lesson ${esc(s.lesson_number)}</span>`,
+      s.level && `<span class="pill muted">${esc(s.level)}</span>`,
+      s.difficulty?.level && `<span class="pill warm">Difficulty ${esc(s.difficulty.level)}${s.difficulty.source === "estimated" ? " (est.)" : ""}</span>`,
+    ].filter(Boolean).join("") : "";
+
+    el.innerHTML = `<summary>
+        <span class="name">${esc(s?.lesson_title || job.file.name)}</span>
+        ${s ? `<span class="file">${esc(job.file.name)}</span>` : ""}
+        <span class="right">${meta}${status}</span>
+      </summary>
+      <div class="body">${job.status === "done" ? renderBody(s) : job.status === "error" ? `<p class="error">${esc(job.error)}</p>` : `<p class="note">Waiting for results…</p>`}</div>`;
+
+    el.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => {
+      el.querySelectorAll(".tabs button, .pane").forEach((x) => x.classList.toggle("on", x.dataset.tab === b.dataset.tab));
+    }));
+    if (job.status === "done" && jobs.length === 1) el.open = true;
+  }
+
+  function renderBody(s) {
+    const i = s.instructor, f = i.lesson_flow;
+    const parent = `
+      <p class="lead">${esc(s.parent_summary)}</p>
+      <h3>Skills developed</h3>
+      ${s.skills_developed.map((k) => `<div class="skill"><span class="pill">${esc(k.skill)}</span><span>${esc(k.how_developed)}</span></div>`).join("")}
+      <h3>Difficulty</h3>
+      <p><b>${esc(s.difficulty.level)}</b> — ${esc(s.difficulty.rationale)}
+        ${s.difficulty.source === "estimated" ? `<br><span class="note">Estimated by AI. Will come from the curriculum sheet once it's connected.</span>` : ""}</p>
+      <h3>Curriculum links</h3>
+      ${s.curriculum_links.length ? list(s.curriculum_links) : `<p class="note">Not mapped yet. These will come from the national curriculum mapping sheet.</p>`}
+      <h3>Fun fact</h3><p>${esc(s.fun_fact)}</p>`;
+
+    const instructor = `
+      <h3>Overview</h3><p>${esc(i.overview)}</p>
+      <h3>Theory to explain</h3><p>${esc(i.theory)}</p>
+      <h3>Real-world examples</h3>${list(i.real_world_examples)}
+      <h3>Objectives</h3>${list(i.objectives)}
+      <h3>Parts &amp; preparation</h3>${list(i.parts_and_preparation)}
+      <h3>Lesson flow</h3>
+      <div class="flow">
+        <div class="stage"><b>I. Goal setting</b>${esc(f.goal_setting)}</div>
+        <div class="stage"><b>II. Readiness assessment</b>${list(f.readiness_assessment)}</div>
+        <div class="stage"><b>III. Intro</b>${esc(f.intro)}</div>
+        <div class="stage"><b>III. Intensive study</b>${list(f.intensive_study)}</div>
+        <div class="stage"><b>III. Summary &amp; next lesson</b>${esc(f.summary_and_next)}</div>
+      </div>
+      <h3>Observations &amp; feedback</h3>
+      ${i.observations.map((o) => `<div class="obs">
+          <div class="row"><b>${esc(o.what_to_observe)}</b><span class="pill">${esc(o.skill)}</span></div>
+          <p class="how">${esc(o.how_to_observe)}</p>
+          <select><option>Select feedback…</option>${o.responses.map((r) => `<option>${esc(r)}</option>`).join("")}</select>
+        </div>`).join("")}
+      <h3>Challenges</h3>
+      ${i.challenges.map((c) => `<div class="ch"><div class="row"><b>${esc(c.title)}</b>
+          <span class="pill ${c.source === "textbook" ? "muted" : "warm"}">${c.source === "textbook" ? "Textbook" : "AI variation"}</span>
+          <span class="pill">${esc(c.skill)}</span></div><p>${esc(c.description)}</p></div>`).join("")}
+      <h3>Common difficulties</h3>${list(i.common_difficulties)}`;
+
+    return `<p class="built">${esc(s.what_was_built)}</p>
+      <div class="tabs">
+        <button class="on" data-tab="parent">For parents</button>
+        <button data-tab="instructor">For instructors</button>
+        <button data-tab="json">JSON</button>
+      </div>
+      <div class="pane on" data-tab="parent">${parent}</div>
+      <div class="pane" data-tab="instructor">${instructor}</div>
+      <div class="pane" data-tab="json"><pre>${esc(JSON.stringify(s, null, 2))}</pre></div>`;
+  }
+
+  function updateBar() {
+    const done = jobs.filter((j) => j.status === "done");
+    const failed = jobs.filter((j) => j.status === "error").length;
+    const pending = jobs.length - done.length - failed;
+    $("bar").classList.toggle("show", jobs.length > 0);
+    $("count").textContent = `${done.length} of ${jobs.length} done` + (failed ? ` · ${failed} failed` : "") + (pending ? ` · ${pending} in progress` : "");
+    $("dlJson").disabled = $("dlCsv").disabled = !done.length;
+  }
+
+  function download(name, text, type) {
+    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([text], { type })), download: name });
+    a.click(); URL.revokeObjectURL(a.href);
+  }
+
+  $("dlJson").addEventListener("click", () => {
+    const out = jobs.filter((j) => j.status === "done").map((j) => ({ file: j.file.name, ...j.summary }));
+    download("lesson-summaries.json", JSON.stringify(out, null, 2), "application/json");
+  });
+
+  $("dlCsv").addEventListener("click", () => {
+    const cols = ["file", "lesson_number", "lesson_title", "level", "difficulty", "skills", "curriculum_links", "what_was_built", "parent_summary"];
+    const cell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const rows = jobs.filter((j) => j.status === "done").map(({ file, summary: s }) => [
+      file.name, s.lesson_number, s.lesson_title, s.level, s.difficulty.level,
+      s.skills_developed.map((k) => k.skill).join("; "), s.curriculum_links.join("; "), s.what_was_built, s.parent_summary,
+    ].map(cell).join(","));
+    download("lesson-summaries.csv", "﻿" + [cols.join(","), ...rows].join("\n"), "text/csv");
+  });
+
+  $("clear").addEventListener("click", () => {
+    for (let k = jobs.length - 1; k >= 0; k--) {
+      if (jobs[k].status === "done" || jobs[k].status === "error") { $(jobs[k].id).remove(); jobs.splice(k, 1); }
+    }
+    updateBar();
+  });
+
+  const drop = $("drop");
+  $("file").addEventListener("change", (e) => { addFiles(e.target.files); e.target.value = ""; });
   ["dragenter", "dragover"].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add("over"); }));
   ["dragleave", "drop"].forEach((t) => drop.addEventListener(t, () => drop.classList.remove("over")));
-  drop.addEventListener("drop", (e) => { e.preventDefault(); handle(e.dataTransfer.files[0]); });
-
-  $("toggle").addEventListener("click", () => {
-    const shown = $("json").classList.toggle("show");
-    $("toggle").textContent = shown ? "Hide JSON" : "Show JSON";
-  });
-  $("copy").addEventListener("click", async () => {
-    await navigator.clipboard.writeText(lastJson);
-    $("copy").textContent = "Copied";
-    setTimeout(() => ($("copy").textContent = "Copy JSON"), 1500);
-  });
+  drop.addEventListener("drop", (e) => { e.preventDefault(); addFiles(e.dataTransfer.files); });
 </script>
 </body>
 </html>

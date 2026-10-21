@@ -1,0 +1,146 @@
+{
+  "lesson_title": "F1 Racer",
+  "lesson_number": "9",
+  "level": "Engineer Race Cars",
+  "what_was_built": "A motorised F1-style racer with a wired controller that can be driven forwards and backwards.",
+  "difficulty": {
+    "level": "4",
+    "rationale": "This lesson is fairly demanding for the level because children must build a compact chassis, align wheels and gears accurately, and then complete the electrical setup so the model can be controlled. It combines mechanical assembly with basic circuit understanding and careful orientation of parts.",
+    "source": "estimated"
+  },
+  "skills_developed": [
+    {
+      "skill": "Spatial Awareness",
+      "how_developed": "Children must visualise how the chassis, wheelbase, and body sections fit together in the correct orientation and order."
+    },
+    {
+      "skill": "Attention to Detail",
+      "how_developed": "The model only works properly if gears, axles, and wires are placed in the right positions and directions."
+    },
+    {
+      "skill": "Problem Solving",
+      "how_developed": "If the car does not move smoothly, children need to identify whether the issue is with alignment, wheel placement, or the controller setup."
+    },
+    {
+      "skill": "Engineering Design",
+      "how_developed": "The lesson shows how a race car body, drivetrain, and control system combine into one functional machine."
+    }
+  ],
+  "curriculum_links": [],
+  "parent_summary": "Today your child built a motorised F1-style racer with a controller, learning how a moving vehicle is designed from the inside out. This is a challenging project for their age because it combines careful model building, mechanical alignment, and basic electronics in one lesson. It develops spatial awareness, attention to detail, problem solving, and engineering design as they turn separate parts into a working machine. The lesson also links to real-world ideas about race cars, speed, and how engineers make vehicles faster and more efficient.",
+  "instructor": {
+    "overview": "This lesson teaches children how a compact race car becomes a controllable robot by combining a chassis, wheels, motors, and a wired control system. The main mechanism is the transfer of power from the motors through the wheel assembly, with the controller providing direction and movement.",
+    "theory": "Explain that the motors are the ‘engine’ of the robot, and the gears and axles help turn that power into wheel movement. The controller sends the command, and the car moves because the electrical power is turned into motion.",
+    "real_world_examples": [
+      "Formula 1 pit crews changing and checking cars quickly",
+      "Remote-controlled toy cars",
+      "Electric wheelchairs or mobility scooters",
+      "Assembly lines where parts are fitted together to make a vehicle work"
+    ],
+    "objectives": [
+      "Develop spatial awareness by combining separate chassis sections into one aligned vehicle frame.",
+      "Strengthen attention to detail by placing wheels, gears, and axles in the correct orientation.",
+      "Build problem-solving skills by checking why the car moves smoothly or not at all.",
+      "Apply engineering design by recognising how body shape, wheel placement, and power delivery affect performance.",
+      "Practise fine motor skills through precise placement of small structural and mechanical parts."
+    ],
+    "parts_and_preparation": [
+      "DC motors x2",
+      "Wheels x2",
+      "Gear wheels and small connector gears",
+      "Mainboard/control unit",
+      "Battery case",
+      "Wired controller",
+      "Axles and connecting rods",
+      "Body beams and chassis pieces in black, red, yellow, blue, and white",
+      "Pre-check that the controller, battery case, and motors are available and working before class",
+      "Have the mainboard ready for the final wiring stage and ensure batteries are charged or fitted as required"
+    ],
+    "lesson_flow": {
+      "goal_setting": "Today we are building a fast F1 racer that can be controlled with a wired controller.",
+      "readiness_assessment": [
+        "What do you remember about how a motor makes a model move?",
+        "Can you name a part that helps a wheel turn smoothly?",
+        "What do you think the controller does in a robot car?"
+      ],
+      "intro": "Link this lesson to previous vehicle builds by explaining that today’s model is a faster, more streamlined racer. Tell the children that they will not only build the car, but also bring it to life with the controller at the end.",
+      "intensive_study": [
+        "Show the children how the two motors sit together and why the red wire orientation matters.",
+        "Point out the chassis sections and explain that the frame must stay straight so the wheels line up properly.",
+        "When fitting gears and axles, pause to check that the gears mesh without forcing them; give immediate feedback if the car feels stiff.",
+        "During the body build, remind children to keep left and right sides symmetrical so the racer stays balanced.",
+        "In the wiring stage, demonstrate each connection slowly and check that children can identify the controller, motors, and battery case before they power on."
+      ],
+      "summary_and_next": "Summarise that the children have built a complete racing robot that turns electrical power into movement. Preview that next time they may refine, test, or extend the model, using what they learned about balance, power, and control."
+    },
+    "observations": [
+      {
+        "what_to_observe": "Whether the child keeps the chassis straight and balanced as the model grows.",
+        "how_to_observe": "Watch from above as they join the main sections and check whether both sides match in length and position.",
+        "skill": "Spatial Awareness",
+        "responses": [
+          "Independently kept the frame aligned and symmetrical.",
+          "With some guidance, corrected the alignment of the chassis.",
+          "Needed significant support to position the frame accurately."
+        ]
+      },
+      {
+        "what_to_observe": "Whether the child notices and corrects part orientation, especially wires and directional pieces.",
+        "how_to_observe": "Observe if they check the direction of motors, wires, and connectors before pressing parts together.",
+        "skill": "Attention to Detail",
+        "responses": [
+          "Independently checked orientations before fitting parts.",
+          "With some guidance, noticed and corrected a few orientation errors.",
+          "Needed significant support to place parts in the correct direction."
+        ]
+      },
+      {
+        "what_to_observe": "How the child responds if the car does not roll or power on as expected.",
+        "how_to_observe": "See whether they can test, identify a likely cause, and try a different solution rather than guessing randomly.",
+        "skill": "Problem Solving",
+        "responses": [
+          "Independently identified and fixed the issue after testing.",
+          "With some guidance, found the likely cause and improved the model.",
+          "Needed significant support to diagnose and solve the problem."
+        ]
+      },
+      {
+        "what_to_observe": "How carefully the child handles small mechanical parts during the build.",
+        "how_to_observe": "Watch for controlled finger movements when placing gears, axles, and connectors into tight spaces.",
+        "skill": "Fine Motor Skills",
+        "responses": [
+          "Independently handled small parts with good control.",
+          "With some guidance, managed the small parts accurately.",
+          "Needed significant support to place small parts safely and precisely."
+        ]
+      }
+    ],
+    "challenges": [
+      {
+        "title": "Speed Tune-Up",
+        "description": "Adjust the model’s setup so it rolls as smoothly as possible and discuss what makes it faster or slower.",
+        "source": "ai_variation",
+        "skill": "Critical Thinking"
+      },
+      {
+        "title": "Balance Check",
+        "description": "Compare the left and right sides of the racer and improve symmetry where possible.",
+        "source": "ai_variation",
+        "skill": "Spatial Awareness"
+      },
+      {
+        "title": "Pit Crew Test",
+        "description": "Test the controller and explain what each connection does before driving the model.",
+        "source": "ai_variation",
+        "skill": "Logical Thinking"
+      }
+    ],
+    "common_difficulties": [
+      "Children may reverse the motor or wire orientation, so remind them to check the red wire placement carefully.",
+      "The chassis can twist if parts are not aligned evenly; encourage them to compare both sides before moving on.",
+      "Gears may feel stiff if pushed together too tightly; show that parts should mesh smoothly rather than be forced.",
+      "Some children may focus on finishing quickly and miss the wiring sequence; slow the pace and use the diagram as a checkpoint."
+    ]
+  },
+  "fun_fact": "Formula 1 pit crews can change all four tyres in around two seconds, which is faster than most people can blink."
+}
