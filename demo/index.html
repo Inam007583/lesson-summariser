@@ -76,9 +76,7 @@
   .stage b { display: block; font-size: 13px; margin-bottom: 2px; }
   .obs { padding: 12px; border: 1px solid var(--border); border-radius: 10px; }
   .obs + .obs { margin-top: 8px; }
-  .obs .how { color: var(--muted); font-size: 14px; margin: 4px 0 8px; }
-  .obs select { font: inherit; font-size: 14px; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--text); max-width: 100%; }
+  .obs .how { color: var(--muted); font-size: 14px; margin: 4px 0 0; }
   .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .ch + .ch { margin-top: 10px; }
   .ch b { margin-right: 6px; }
@@ -207,11 +205,10 @@
         <div class="stage"><b>III. Intensive study</b>${list(f.intensive_study)}</div>
         <div class="stage"><b>III. Summary &amp; next lesson</b>${esc(f.summary_and_next)}</div>
       </div>
-      <h3>Observations &amp; feedback</h3>
+      <h3>Observations</h3>
       ${i.observations.map((o) => `<div class="obs">
           <div class="row"><b>${esc(o.what_to_observe)}</b><span class="pill">${esc(o.skill)}</span></div>
           <p class="how">${esc(o.how_to_observe)}</p>
-          <select><option>Select feedback…</option>${o.responses.map((r) => `<option>${esc(r)}</option>`).join("")}</select>
         </div>`).join("")}
       <h3>Challenges</h3>
       ${i.challenges.map((c) => `<div class="ch"><div class="row"><b>${esc(c.title)}</b>
